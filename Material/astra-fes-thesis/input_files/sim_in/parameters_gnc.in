@@ -1,0 +1,19 @@
+%% Input the simulation period (days)
+1
+
+%% Begin simulation
+%  Request initial calendar date and time
+%  Month
+4
+%  Day
+1
+%  Year
+2020
+
+%% UT time with 0:24 hours
+%  Hours
+12
+%  Minutes
+30
+%  Seconds
+0

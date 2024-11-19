@@ -1,0 +1,20 @@
+{
+
+    "EOP": {
+        "file": "eop_iau2000a.txt"
+    }, 
+
+    "Leapseconds": {
+        "file": "naif0012.tls"
+    },
+    
+    "MagneticModel": {
+        "file": "IGRF13.txt"
+    }, 
+
+    "GravityModel": {
+        "file": "egm2008.gfc", 
+        "degree": 40
+    }
+
+}

@@ -1,0 +1,215 @@
+function [TRI,face_id,is_panel,tri_num_face,tri_num_panel,XYZ,TRI_center,TRI_normal] = wings_triangulation(NS,L_s,L_l,L_p)
+
+% variable initialisation
+XX = [];                        % x coordinates of triangulation points
+YY = [];                        % y coordinates of triangulation points
+ZZ = [];                        % z coordinates of triangulation points
+TRI = [];                       % connectivity list of triangulation
+face_id = [];
+is_panel = [];
+tri_num_face = zeros(NS,1);
+tri_num_panel= zeros(NS,1);
+
+nn =2;
+nu = nn^2*2;
+
+% face 1 -> +x
+i = 1;
+y_p = linspace(0,L_s,nn+1);
+z_p = linspace(0,2/3*L_l,2*nn+1);
+[y_p,z_p] = meshgrid(y_p,z_p);
+Y_p = reshape(y_p,[],1);
+Z_p = reshape(z_p,[],1);
+X_p = L_s*ones(size(Y_p,1),1);
+y = linspace(0,L_s,nn+1);
+z = linspace(2/3*L_l,L_l,nn+1);
+[y,z] = meshgrid(y,z);
+Y = reshape(y,[],1);
+Z = reshape(z,[],1);
+X = L_s*ones(size(Y,1),1);
+XX = [XX;X_p;X]; %#ok<*AGROW>
+YY = [YY;Y_p;Y];
+ZZ = [ZZ;Z_p;Z];
+tri1 = delaunay(Y_p,Z_p);
+tri2 = delaunay(Y,Z);
+tri2 = tri2+max(max(tri1))*ones(size(tri2));
+tri = [tri1;tri2]+0*ones(size([tri1;tri2]));
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1);i*ones(size(tri2,1),1)];
+is_panel = [is_panel; ones(size(tri1,1),1);zeros(size(tri2,1),1)];
+tri_num_face(i) = nu*3;
+tri_num_panel(i) = nu*2;
+
+% face 2 -> -x
+i = i+1;
+y_p = linspace(0,L_s,nn+1);
+z_p = linspace(1/3*L_l,2/3*L_l,nn+1);
+[y_p,z_p] = meshgrid(y_p,z_p);
+Y_p = reshape(y_p,[],1);
+Z_p = reshape(z_p,[],1);
+X_p = 0*ones(size(Y_p,1),1);
+y1 = linspace(0,L_s,nn+1);
+y2 = linspace(0,L_s,nn+1);
+z1 = linspace(0*L_l,1/3*L_l,nn+1);
+z2 = linspace(2/3*L_l,L_l,nn+1);
+[y1,z1] = meshgrid(y1,z1);
+[y2,z2] = meshgrid(y2,z2);
+Y1 = reshape(y1,[],1);
+Y2 = reshape(y2,[],1);
+Z1 = reshape(z1,[],1);
+Z2 = reshape(z2,[],1);
+X = 0*ones(size(Y1,1),1);
+XX = [XX;X;X_p;X]; %#ok<*AGROW>
+YY = [YY;Y1;Y_p;Y2];
+ZZ = [ZZ;Z1;Z_p;Z2];
+tri1 = delaunay(Y1,Z1);
+tri2 = delaunay(Y_p,Z_p);
+tri2 = tri2+max(max(tri1))*ones(size(tri2));
+tri3 = delaunay(Y2,Z2);
+tri3 = tri3+max(max(tri2))*ones(size(tri3));
+tri = [tri1;tri2;tri3]+max(max(tri))*ones(size([tri1;tri2;tri3]));
+tri = [tri(:,1) tri(:,3) tri(:,2)];
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1);i*ones(size(tri2,1),1);i*ones(size(tri3,1),1)];
+is_panel = [is_panel; zeros(size(tri1,1),1);ones(size(tri2,1),1);zeros(size(tri3,1),1)];
+tri_num_face(i) = nu*3;
+tri_num_panel(i) = nu*1;
+
+% face 3 -> +y
+i = i+1;
+x_p = linspace(0,L_s,nn+1);
+z_p = linspace(1/3*L_l,2/3*L_l,nn+1);
+[x_p,z_p] = meshgrid(x_p,z_p);
+X_p = reshape(x_p,[],1);
+Z_p = reshape(z_p,[],1);
+Y_p = L_s*ones(size(X_p,1),1);
+x1 = linspace(0,L_s,nn+1);
+x2 = linspace(0,L_s,nn+1);
+z1 = linspace(0*L_l,1/3*L_l,nn+1);
+z2 = linspace(2/3*L_l,L_l,nn+1);
+[x1,z1] = meshgrid(x1,z1);
+[x2,z2] = meshgrid(x2,z2);
+X1 = reshape(x1,[],1);
+X2 = reshape(x2,[],1);
+Z1 = reshape(z1,[],1);
+Z2 = reshape(z2,[],1);
+Y = L_s*ones(size(X,1),1);
+XX = [XX;X1;X_p;X2]; %#ok<*AGROW>
+YY = [YY;Y;Y_p;Y];
+ZZ = [ZZ;Z1;Z_p;Z2];
+tri1 = delaunay(X1,Z1);
+tri2 = delaunay(X_p,Z_p);
+tri2 = tri2+max(max(tri1))*ones(size(tri2));
+tri3 = delaunay(X2,Z2);
+tri3 = tri3+max(max(tri2))*ones(size(tri3));
+tri = [tri1;tri2;tri3]+max(max(TRI))*ones(size([tri1;tri2;tri3]));
+tri = [tri(:,1) tri(:,3) tri(:,2)];
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1);i*ones(size(tri2,1),1);i*ones(size(tri3,1),1)];
+is_panel = [is_panel; zeros(size(tri1,1),1);ones(size(tri2,1),1);zeros(size(tri3,1),1)];
+tri_num_face(i) = nu*3;
+tri_num_panel(i) = nu*1;
+
+% face 4 -> -y
+i = i+1;
+x_p = linspace(0,L_s,nn+1);
+z_p = linspace(0*L_l,2/3*L_l,2*nn+1);
+[x_p,z_p] = meshgrid(x_p,z_p);
+X_p = reshape(x_p,[],1);
+Z_p = reshape(z_p,[],1);
+Y_p = 0*ones(size(X_p,1),1);
+x1 = linspace(0,L_s,nn+1);
+z1 = linspace(2/3*L_l,L_l,nn+1);
+[x1,z1] = meshgrid(x1,z1);
+X1 = reshape(x1,[],1);
+Z1 = reshape(z1,[],1);
+Y = 0*ones(size(X1,1),1);
+XX = [XX;X_p;X1]; %#ok<*AGROW>
+YY = [YY;Y_p;Y];
+ZZ = [ZZ;Z_p;Z1];
+tri1 = delaunay(X_p,Z_p);
+tri2 = delaunay(X1,Z1);
+tri2 = tri2+max(max(tri1))*ones(size(tri2));
+tri = [tri1;tri2]+max(max(TRI))*ones(size([tri1;tri2]));
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1);i*ones(size(tri2,1),1)];
+is_panel = [is_panel; ones(size(tri1,1),1);zeros(size(tri2,1),1)];
+tri_num_face(i) = nu*3;
+tri_num_panel(i) = nu*2;
+
+% face 5 -> +z
+i = i+1;
+x1 = linspace(0,L_s,nn+1);
+y1 = linspace(0,L_s,nn+1);
+[x1,y1] = meshgrid(x1,y1);
+X1 = reshape(x1,[],1);
+Y1 = reshape(y1,[],1);
+Z1 = L_l*ones(size(X1,1),1);
+XX = [XX;X1]; %#ok<*AGROW>
+YY = [YY;Y1];
+ZZ = [ZZ;Z1];
+tri1 = delaunay(X1,Y1);
+tri = tri1+max(max(TRI))*ones(size(tri1));
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1)];
+is_panel = [is_panel; zeros(size(tri1,1),1)];
+tri_num_face(i) = nu*1;
+tri_num_panel(i) = 0;
+
+% face 6 -> -z
+i = i+1;
+x1 = linspace(0,L_s,nn+1);
+y1 = linspace(0,L_s,nn+1);
+[x1,y1] = meshgrid(x1,y1);
+X1 = reshape(x1,[],1);
+Y1 = reshape(y1,[],1);
+Z1 = 0*ones(size(X1,1),1);
+XX = [XX;X1]; %#ok<*AGROW>
+YY = [YY;Y1];
+ZZ = [ZZ;Z1];
+tri1 = delaunay(X1,Y1);
+tri1 = [tri1(:,1) tri1(:,3) tri1(:,2)];
+tri = tri1+max(max(TRI))*ones(size(tri1));
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1)];
+is_panel = [is_panel; zeros(size(tri1,1),1)];
+tri_num_face(i) = nu;
+tri_num_panel(i) = 0;
+
+% face7 & 9 -> +w1 (-w1) +w2 (-w1)
+i = i+1;
+x1 = linspace(L_s,(L_s+L_p/sqrt(2)),2*nn+1);
+x2 = linspace(0,(-L_p/sqrt(2)),2*nn+1);
+z1 = linspace(0,L_l,3*nn+1);
+z2 = linspace(0,L_l,3*nn+1);
+[x1,z1] = meshgrid(x1,z1);
+[x2,z2] = meshgrid(x2,z2);
+X1 = reshape(x1,[],1);
+X2 = reshape(x2,[],1);
+Z1 = reshape(z1,[],1);
+Z2 = reshape(z2,[],1);
+Y1 = X1;
+Y2 = X2;
+XX = [XX;X1;X2]; %#ok<*AGROW>
+YY = [YY;Y1;Y2];
+ZZ = [ZZ;Z1;Z2];
+tri1 = delaunay(X1,Z1);
+tri2 = delaunay(X2,Z2);
+tri2 = tri2+max(max(tri1))*ones(size(tri2));
+tri = [tri1;tri2]+max(max(TRI))*ones(size([tri1;tri2]));
+TRI = [TRI;tri];
+face_id = [face_id; i*ones(size(tri1,1),1);(i+2)*ones(size(tri1,1),1)];
+is_panel = [is_panel;ones(size(tri1,1),1);ones(size(tri2,1),1)];
+tri_num_face(i) = 6*nu;
+tri_num_face(i+1) = 6*nu;
+tri_num_face(i+2) = 6*nu;
+tri_num_face(i+3) = 6*nu;
+tri_num_panel(i) = 6*nu;
+tri_num_panel(i+2) = 6*nu;
+
+% triangulation
+TR = triangulation(TRI,XX,YY,ZZ);
+XYZ = [XX';YY';ZZ'];
+
+TRI_center = incenter(TR);
+TRI_normal = faceNormal(TR);
